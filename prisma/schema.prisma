@@ -1,0 +1,163 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model group {
+  id          String        @id @db.Uuid
+  name        String?       @db.VarChar
+  created_at  DateTime?     @db.Timestamp(6)
+  updated_at  DateTime?     @db.Timestamp(6)
+  group_users group_users[]
+  message     message[]
+}
+
+model group_users {
+  id         String    @id @db.Uuid
+  group_id   String?   @db.Uuid
+  user_id    String?   @db.Uuid
+  created_at DateTime? @db.Timestamp(6)
+  updated_at DateTime? @db.Timestamp(6)
+  group      group?    @relation(fields: [group_id], references: [id])
+  users      users?    @relation(fields: [user_id], references: [id])
+}
+
+model materi {
+  id                String              @id @db.Uuid
+  author_id         String?             @db.Uuid
+  title             String?
+  description       String?
+  thumbnail         String?             @db.VarChar
+  url               String?             @db.VarChar
+  type              Int?
+  created_at        DateTime?           @db.Timestamp(6)
+  updated_at        DateTime?           @db.Timestamp(6)
+  users             users?              @relation(fields: [author_id], references: [id])
+  take_materi_items take_materi_items[]
+}
+
+model message {
+  id         String    @id @db.Uuid
+  group_id   String?   @db.Uuid
+  user_id    String?   @db.Uuid
+  message    String?
+  created_at DateTime? @db.Timestamp(6)
+  updated_at DateTime? @db.Timestamp(6)
+  group      group?    @relation(fields: [group_id], references: [id])
+  users      users?    @relation(fields: [user_id], references: [id])
+}
+
+model quiz {
+  id                           String          @id @db.Uuid
+  host_id                      String?         @db.Uuid
+  student_id                   String?         @db.Uuid
+  title                        String?         @db.VarChar
+  type                         String?         @db.VarChar
+  meta_title                   String?         @db.VarChar
+  summary                      String?         @db.VarChar
+  score                        Int?
+  published                    Boolean?
+  created_at                   DateTime?       @db.Timestamp(6)
+  updated_at                   DateTime?       @db.Timestamp(6)
+  users_quiz_host_idTousers    users?          @relation("quiz_host_idTousers", fields: [host_id], references: [id])
+  users_quiz_student_idTousers users?          @relation("quiz_student_idTousers", fields: [student_id], references: [id])
+  quiz_answer                  quiz_answer[]
+  quiz_question                quiz_question[]
+  take_quiz                    take_quiz[]
+}
+
+model quiz_answer {
+  id            String         @id @db.Uuid
+  quiz_id       String?        @db.Uuid
+  question_id   String?        @db.Uuid
+  score         String?        @db.Uuid
+  created_at    DateTime?      @db.Timestamp(6)
+  updated_at    DateTime?      @db.Timestamp(6)
+  quiz_question quiz_question? @relation(fields: [question_id], references: [id])
+  quiz          quiz?          @relation(fields: [quiz_id], references: [id])
+  take_answer   take_answer[]
+}
+
+model quiz_question {
+  id          String        @id @db.Uuid
+  quiz_id     String?       @db.Uuid
+  type        String?       @db.VarChar
+  active      Boolean?
+  level       Int?
+  score       Int?
+  created_at  DateTime?     @db.Timestamp(6)
+  updated_at  DateTime?     @db.Timestamp(6)
+  quiz        quiz?         @relation(fields: [quiz_id], references: [id])
+  quiz_answer quiz_answer[]
+  take_answer take_answer[]
+}
+
+model take_answer {
+  id            String         @id @db.Uuid
+  take_id       String?        @db.Uuid
+  question_id   String?        @db.Uuid
+  answer_id     String?        @db.Uuid
+  active        Boolean?
+  created_at    DateTime?      @db.Timestamp(6)
+  updated_at    DateTime?      @db.Timestamp(6)
+  quiz_answer   quiz_answer?   @relation(fields: [answer_id], references: [id])
+  quiz_question quiz_question? @relation(fields: [question_id], references: [id])
+  take_quiz     take_quiz?     @relation(fields: [take_id], references: [id])
+}
+
+model take_materi {
+  id                String              @id @db.Uuid
+  student_id        String?             @db.Uuid
+  created_at        DateTime?           @db.Timestamp(6)
+  updated_at        DateTime?           @db.Timestamp(6)
+  users             users?              @relation(fields: [student_id], references: [id])
+  take_materi_items take_materi_items[]
+}
+
+model take_materi_items {
+  id             String       @id @db.Uuid
+  take_materi_id String?      @db.Uuid
+  materi_id      String?      @db.Uuid
+  created_at     DateTime?    @db.Timestamp(6)
+  updated_at     DateTime?    @db.Timestamp(6)
+  materi         materi?      @relation(fields: [materi_id], references: [id])
+  take_materi    take_materi? @relation(fields: [take_materi_id], references: [id])
+}
+
+model take_quiz {
+  id          String        @id @db.Uuid
+  user_id     String?       @db.Uuid
+  quiz_id     String?       @db.Uuid
+  status      Boolean?
+  score       Int?
+  published   Boolean?
+  created_at  DateTime?     @db.Timestamp(6)
+  updated_at  DateTime?     @db.Timestamp(6)
+  quiz        quiz?         @relation(fields: [quiz_id], references: [id])
+  users       users?        @relation(fields: [user_id], references: [id])
+  take_answer take_answer[]
+}
+
+model users {
+  id                          String        @id @db.Uuid
+  name                        String?       @db.VarChar
+  email                       String?       @db.VarChar
+  username                    String?       @db.VarChar
+  password                    String?       @db.VarChar
+  address                     String?
+  previlage                   String?       @db.VarChar
+  image_url                   String?       @db.VarChar
+  created_at                  DateTime?     @db.Timestamp(6)
+  updated_at                  DateTime?     @db.Timestamp(6)
+  group_users                 group_users[]
+  materi                      materi[]
+  message                     message[]
+  quiz_quiz_host_idTousers    quiz[]        @relation("quiz_host_idTousers")
+  quiz_quiz_student_idTousers quiz[]        @relation("quiz_student_idTousers")
+  take_materi                 take_materi[]
+  take_quiz                   take_quiz[]
+}
