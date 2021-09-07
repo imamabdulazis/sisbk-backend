@@ -7,7 +7,7 @@ const { hash } = require("bcryptjs");
 const config = require("../../utils/config");
 // const { PrismaClient } = require(".prisma/client");
 const { readHTMLFile, smtpTransport } = require("../../utils/email");
-const prisma = require("../../utils/db");
+const {prisma} = require("../../utils/db");
 
 // const prisma = new PrismaClient();
 
@@ -28,7 +28,6 @@ router.post("/signup", async (req, res, next) => {
         message: "Email sudah terdaftar",
       });
     } else {
-      console.log("HAHAHAHAHAH");
       const users = await prisma.users.create({
         data: {
           id: uuid(),
