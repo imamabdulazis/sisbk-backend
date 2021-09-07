@@ -5,10 +5,11 @@ const path = require("path");
 const handlebars = require("handlebars");
 const { hash } = require("bcryptjs");
 const config = require("../../utils/config");
-const { PrismaClient } = require(".prisma/client");
+// const { PrismaClient } = require(".prisma/client");
 const { readHTMLFile, smtpTransport } = require("../../utils/email");
+const prisma = require("../../utils/db");
 
-const prisma = new PrismaClient();
+// const prisma = new PrismaClient();
 
 router.post("/signup", async (req, res, next) => {
   try {
@@ -43,10 +44,7 @@ router.post("/signup", async (req, res, next) => {
         },
       });
       if (users) {
-        const postsDirectory = path.join(
-          process.cwd(),
-          "/public/email.html"
-        );
+        const postsDirectory = path.join(process.cwd(), "/public/email.html");
         return readHTMLFile(postsDirectory, function (err, html) {
           var template = handlebars.compile(html);
           var replacements = {
