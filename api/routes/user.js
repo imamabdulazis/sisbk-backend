@@ -21,9 +21,7 @@ router.post("/signup", async (req, res, next) => {
         email: req.body.email,
       },
     });
-    console.log(isEmail)
     if (isEmail != null) {
-      // console.log(isEmail);
       return res.status(409).json({
         status: 409,
         message: "Email sudah terdaftar",
