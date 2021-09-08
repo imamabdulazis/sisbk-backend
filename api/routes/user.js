@@ -5,7 +5,7 @@ const path = require("path");
 const handlebars = require("handlebars");
 const { hash } = require("bcryptjs");
 const config = require("../../utils/config");
-// const { PrismaClient } = require(".prisma/client");
+// const { PrismaClient } = require("@prisma/client");
 const { readHTMLFile, smtpTransport } = require("../../utils/email");
 const {prisma} = require("../../utils/db");
 
