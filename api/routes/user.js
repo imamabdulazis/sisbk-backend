@@ -1,90 +1,51 @@
 const express = require("express");
 const router = express.Router();
-const { v4: uuid } = require("uuid");
-const path = require("path");
+const bcrypt = require("bcryptjs");
 const handlebars = require("handlebars");
-const { hash } = require("bcryptjs");
+const path = require("path");
+const { v4: uuid } = require("uuid");
 const config = require("../../utils/config");
-// const { PrismaClient } = require("@prisma/client");
 const { readHTMLFile, smtpTransport } = require("../../utils/email");
-const {prisma} = require("../../utils/db");
+const jwt = require("jsonwebtoken");
+const checkAuth = require("../middleware/check_auth");
+const Multer = require("multer");
 
-// const prisma = new PrismaClient();
+const UserController = require("../controllers/userController");
 
-router.post("/signup", async (req, res, next) => {
-  try {
-    let generatedToken = uuid();
-    // const randomstring = Math.random().toString(36).slice(-8);
-    const hashed = await hash(req.body.password, 10);
-    const isEmail = await prisma.users.findFirst({
-      where: {
-        email: req.body.email,
-      },
-    });
-    if (isEmail != null) {
-      return res.status(409).json({
-        status: 409,
-        message: "Email sudah terdaftar",
-      });
-    } else {
-      const users = await prisma.users.create({
-        data: {
-          id: uuid(),
-          name: req.body.name,
-          username: req.body.username,
-          email: req.body.email,
-          password: hashed,
-          address: req.body.address,
-          previlage: req.body.previlage,
-          image_url: `https://firebasestorage.googleapis.com/v0/b/${config.storageBucket}/o/users/users.png?alt=media&token=${generatedToken}`,
-          created_at: new Date(),
-          updated_at: new Date(),
-        },
-      });
-      if (users) {
-        const postsDirectory = path.join(process.cwd(), "/public/email.html");
-        return readHTMLFile(postsDirectory, function (err, html) {
-          var template = handlebars.compile(html);
-          var replacements = {
-            username: req.body.username,
-          };
-          var htmlToSend = template(replacements);
-          var mailOptions = {
-            from: "sistinfor21@gmail.com",
-            to: req.body.email,
-            subject: `Selamat Datang ${req.body.name}`,
-            html: htmlToSend,
-          };
-          return smtpTransport.sendMail(
-            mailOptions,
-            function (error, response) {
-              if (error) {
-                return res.status(500).json({
-                  status: 500,
-                  message: error,
-                });
-              } else {
-                return res.status(200).json({
-                  status: 200,
-                  message: `Berhasil daftar ${req.body.email}`,
-                });
-              }
-            }
-          );
-        });
-      }
-    }
-  } catch (error) {
-    console.log(error);
-    return res.status(500).json({
-      status: 500,
-      message: error,
-    });
-  }
+// const { prisma } = require("../../utils/db");
+const { PrismaClient } = require("@prisma/client");
+const { uploadImageToStorage } = require("../../utils/uploader");
+const prisma = new PrismaClient();
+
+const multer = Multer({
+  storage: Multer.memoryStorage(),
+  // limits: {
+  //     fileSize: 5 * 1024 * 1024 // no larger than 5mb, you can change as needed.
+  // }
 });
-/**
- * Get ALL
- */
-router.get("/", (req, res) => {});
+
+/**Controller */
+
+router.post("/signup", UserController.users_signup);
+
+router.post("/login", UserController.users_login);
+
+router.get("/", checkAuth, UserController.get_all_user);
+
+router.get("/:userId", checkAuth, UserController.detail_user);
+
+router.delete("/:userId", checkAuth, UserController.delete_user);
+
+router.put(
+  "/image/:userId",
+  multer.single("image_profile"),
+  UserController.update_image_profile
+);
+
+router.put(
+  "/update_password/:userId",
+  checkAuth,
+  UserController.update_password
+);
 
 module.exports = router;
