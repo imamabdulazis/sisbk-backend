@@ -84,6 +84,7 @@ exports.users_signup = async (req, res, next) => {
 };
 
 exports.users_login = async (req, res, next) => {
+  console.log("Request", req.body);
   try {
     console.log(req.body);
     const user = await prisma.users.findFirst({
@@ -115,8 +116,8 @@ exports.users_login = async (req, res, next) => {
     return res.status(200).json({
       status: 200,
       message: "ok",
-      previlage: user.previlage,
       token: token,
+      data: user,
     });
   } catch (error) {
     console.log(error);
