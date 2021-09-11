@@ -27,9 +27,24 @@ app.use((req, res, next) => {
  * @Routes
  */
 const userRoutes = require("./api/routes/user");
+const materiRoutes = require("./api/routes/materi");
+const messageRoutes = require("./api/routes/message");
+const questionRoutes = require("./api/routes/question");
+const quizRoutes = require("./api/routes/quiz");
+const groupRoutes = require("./api/routes/group");
+const fileRoutes = require("./api/routes/file");
 
+/**
+ * @API
+ */
 app.use(morgan("dev"));
 app.use("/api/user", userRoutes);
+app.use("/api/materi", materiRoutes);
+app.use("/api/message", messageRoutes);
+app.use("/api/question", questionRoutes);
+app.use("/api/quiz", quizRoutes);
+app.use("/api/group", groupRoutes);
+app.use("/api/file", fileRoutes);
 
 app.use((error, req, res, next) => {
   res.status(error.status || 500);

@@ -328,3 +328,63 @@ exports.update_image_profile = async (req, res, next) => {
     });
   }
 };
+
+exports.update_profile = async (req, res, next) => {
+  try {
+    const users = await prisma.users.findUnique({
+      where: {
+        id: req.params.userId,
+      },
+    });
+    if (users) {
+      const findEmail = await prisma.users.findFirst({
+        where: {
+          email: req.body.email,
+        },
+      });
+      if (findEmail) {
+        return res.status(403).json({
+          status: 403,
+          message: `Email ${findEmail.email} telah terdaftar`,
+        });
+      } else {
+        const user = await prisma.users.update({
+          where: {
+            id: req.params.userId,
+          },
+          data: {
+            name: req.body.name,
+            username: req.body.username,
+            email: req.body.email,
+            address: req.body.address,
+            image_url: req.body.image_url,
+            previlage: req.body.previlage,
+          },
+        });
+        if (user) {
+          return res.status(200).json({
+            status: 200,
+            message: "Berhasil update user",
+            data: findUser,
+          });
+        } else {
+          return res.status(403).json({
+            status: 403,
+            message: "Gagal update user",
+          });
+        }
+      }
+    } else {
+      return res.status(403).json({
+        status: 403,
+        message: "User tidak ditemukan",
+      });
+    }
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      status: 500,
+      message: error,
+    });
+  }
+};

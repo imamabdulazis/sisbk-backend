@@ -48,4 +48,6 @@ router.put(
   UserController.update_password
 );
 
+router.put("/profile/:userId", checkAuth, UserController.update_profile);
+
 module.exports = router;
