@@ -21,10 +21,21 @@ exports.users_signup = async (req, res, next) => {
         email: req.body.email,
       },
     });
+    const isName = await prisma.users.findFirst({
+      where: {
+        name: req.body.name,
+      },
+    });
+    if (isName != null) {
+      return res.status(409).json({
+        status: 409,
+        message: `Nama ${req.body.name} sudah terdaftar`,
+      });
+    }
     if (isEmail != null) {
       return res.status(409).json({
         status: 409,
-        message: "Email sudah terdaftar",
+        message: `Email ${req.body.email} sudah terdaftar`,
       });
     } else {
       const users = await prisma.users.create({
@@ -36,7 +47,7 @@ exports.users_signup = async (req, res, next) => {
           password: hashed,
           address: req.body.address,
           previlage: req.body.previlage,
-          image_url: `https://firebasestorage.googleapis.com/v0/b/${config.storageBucket}/o/users/users.png?alt=media&token=${generatedToken}`,
+          image_url: `https://firebasestorage.googleapis.com/v0/b/${config.storageBucket}/o/users%2Fusers.png?alt=media&token=${generatedToken}`,
           created_at: new Date(),
           updated_at: new Date(),
         },
@@ -84,7 +95,6 @@ exports.users_signup = async (req, res, next) => {
 };
 
 exports.users_login = async (req, res, next) => {
-  console.log("Request", req.body);
   try {
     console.log(req.body);
     const user = await prisma.users.findFirst({
@@ -342,36 +352,66 @@ exports.update_profile = async (req, res, next) => {
           email: req.body.email,
         },
       });
-      if (findEmail) {
+      if (findEmail && req.params.userId != users.id) {
         return res.status(403).json({
           status: 403,
           message: `Email ${findEmail.email} telah terdaftar`,
         });
       } else {
-        const user = await prisma.users.update({
-          where: {
-            id: req.params.userId,
-          },
-          data: {
-            name: req.body.name,
-            username: req.body.username,
-            email: req.body.email,
-            address: req.body.address,
-            image_url: req.body.image_url,
-            previlage: req.body.previlage,
-          },
-        });
-        if (user) {
-          return res.status(200).json({
-            status: 200,
-            message: "Berhasil update user",
-            data: findUser,
+        if (req.body.is_change_password) {
+          const hashed = await bcrypt.hash(req.body.password, 10);
+          const user = await prisma.users.update({
+            where: {
+              id: req.params.userId,
+            },
+            data: {
+              name: req.body.name,
+              username: req.body.username,
+              email: req.body.email,
+              address: req.body.address,
+              image_url: req.body.image_url,
+              password: hashed,
+              previlage: req.body.previlage,
+            },
           });
+          if (user) {
+            return res.status(200).json({
+              status: 200,
+              message: "Berhasil update user",
+              data: users,
+            });
+          } else {
+            return res.status(403).json({
+              status: 403,
+              message: "Gagal update user",
+            });
+          }
         } else {
-          return res.status(403).json({
-            status: 403,
-            message: "Gagal update user",
+          const user = await prisma.users.update({
+            where: {
+              id: req.params.userId,
+            },
+            data: {
+              name: req.body.name,
+              username: req.body.username,
+              email: req.body.email,
+              address: req.body.address,
+              image_url: req.body.image_url,
+              previlage: req.body.previlage,
+            },
           });
+          if (user) {
+            return res.status(200).json({
+              status: 200,
+              message: "Berhasil update user",
+              data: users,
+            });
+          } else {
+            return res.status(403).json({
+              status: 403,
+              message: "Gagal update user",
+            });
+          }
         }
       }
     } else {
