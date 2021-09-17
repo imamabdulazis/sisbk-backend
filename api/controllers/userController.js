@@ -61,7 +61,7 @@ exports.users_signup = async (req, res, next) => {
           };
           var htmlToSend = template(replacements);
           var mailOptions = {
-            from: "sistinfor21@gmail.com",
+            from: process.env.EMAIL,
             to: req.body.email,
             subject: `Selamat Datang ${req.body.name}`,
             html: htmlToSend,

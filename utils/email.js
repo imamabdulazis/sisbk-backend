@@ -15,6 +15,8 @@ var readHTMLFile = function (path, callback) {
 smtpTransport = nodemailer.createTransport(
   smtpTransport({
     service: "gmail",
+    secure:true,
+    port: 465,
     auth: {
       user: process.env.EMAIL,
       pass: process.env.PASSWORD,
