@@ -8,21 +8,22 @@ datasource db {
 }
 
 model users {
-  id                          String        @id @db.Uuid
-  name                        String?       @db.VarChar
-  email                       String?       @db.VarChar
-  username                    String?       @db.VarChar
-  password                    String?       @db.VarChar
+  id                          String            @id @db.Uuid
+  name                        String?           @db.VarChar
+  email                       String?           @db.VarChar
+  username                    String?           @db.VarChar
+  password                    String?           @db.VarChar
   address                     String?
-  previlage                   String?       @db.VarChar
-  image_url                   String?       @db.VarChar
-  created_at                  DateTime?     @db.Timestamp(6)
-  updated_at                  DateTime?     @db.Timestamp(6)
+  previlage                   String?           @db.VarChar
+  image_url                   String?           @db.VarChar
+  created_at                  DateTime?         @db.Timestamp(6)
+  updated_at                  DateTime?         @db.Timestamp(6)
+  contact_teacher             contact_teacher[]
   group_users                 group_users[]
   materi                      materi[]
   message                     message[]
-  quiz_quiz_host_idTousers    quiz[]        @relation("quiz_host_idTousers")
-  quiz_quiz_student_idTousers quiz[]        @relation("quiz_student_idTousers")
+  quiz_quiz_host_idTousers    quiz[]            @relation("quiz_host_idTousers")
+  quiz_quiz_student_idTousers quiz[]            @relation("quiz_student_idTousers")
   take_materi                 take_materi[]
   take_quiz                   take_quiz[]
 }
@@ -160,4 +161,17 @@ model take_quiz {
   quiz        quiz?         @relation(fields: [quiz_id], references: [id])
   users       users?        @relation(fields: [user_id], references: [id])
   take_answer take_answer[]
+}
+
+model contact_teacher {
+  id        String  @id @db.Uuid
+  author_id String? @db.Uuid
+  name      String? @db.VarChar
+  email     String? @db.VarChar
+  phone     String? @db.VarChar
+  address   String?
+  image_url String?
+  job_desc  String?
+  edu_title String? @db.VarChar
+  users     users?  @relation(fields: [author_id], references: [id])
 }
