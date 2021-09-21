@@ -47,7 +47,10 @@ exports.users_signup = async (req, res, next) => {
           password: hashed,
           address: req.body.address,
           previlage: req.body.previlage,
-          image_url: `https://firebasestorage.googleapis.com/v0/b/${config.storageBucket}/o/users%2Fusers.png?alt=media&token=${generatedToken}`,
+          image_url:
+            req.body.image_url != null
+              ? req.body.image_url
+              : `https://firebasestorage.googleapis.com/v0/b/${config.storageBucket}/o/users%2Fusers.png?alt=media&token=${generatedToken}`,
           created_at: new Date(),
           updated_at: new Date(),
         },
@@ -372,6 +375,10 @@ exports.update_profile = async (req, res, next) => {
               image_url: req.body.image_url,
               password: hashed,
               previlage: req.body.previlage,
+              image_url:
+                req.body.image_url != null
+                  ? req.body.image_url
+                  : findContact.image_url,
             },
           });
           if (user) {

@@ -34,7 +34,10 @@ exports.createContact = async (req, res, next) => {
           email: req.body.email,
           address: req.body.address,
           edu_title: req.body.edu_title,
-          image_url: `https://firebasestorage.googleapis.com/v0/b/${config.storageBucket}/o/users%2Fusers.png?alt=media&token=${generatedToken}`,
+          image_url:
+            req.body.image_url != null
+              ? req.body.image_url
+              : `https://firebasestorage.googleapis.com/v0/b/${config.storageBucket}/o/users%2Fusers.png?alt=media&token=${generatedToken}`,
           job_desc: req.body.job_desc,
           phone: req.body.phone,
         },
@@ -109,6 +112,10 @@ exports.contactUpdate = async (req, res, next) => {
           edu_title: req.body.edu_title,
           job_desc: req.body.job_desc,
           phone: req.body.phone,
+          image_url:
+            req.body.image_url != null
+              ? req.body.image_url
+              : findContact.image_url,
         },
       });
       if (updateContact) {

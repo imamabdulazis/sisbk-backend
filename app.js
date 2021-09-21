@@ -34,6 +34,7 @@ const quizRoutes = require("./api/routes/quiz");
 const groupRoutes = require("./api/routes/group");
 const fileRoutes = require("./api/routes/file");
 const contactRoutes = require("./api/routes/contact");
+const takeMateriItems = require("./api/routes/takeMateri");
 
 /**
  * @API
@@ -47,6 +48,7 @@ app.use("/api/quiz", quizRoutes);
 app.use("/api/group", groupRoutes);
 app.use("/api/file", fileRoutes);
 app.use("/api/contact", contactRoutes);
+app.use("/api/take_materi", takeMateriItems);
 
 app.use((error, req, res, next) => {
   res.status(error.status || 500);

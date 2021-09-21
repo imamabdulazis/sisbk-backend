@@ -1,9 +1,12 @@
 const { v4: uuid } = require("uuid");
-const { readHTMLFile, smtpTransport } = require("../../utils/email");
+const config = require("../../utils/config");
 const { prisma } = require("../../utils/db");
 const { uploadImageToStorage } = require("../../utils/uploader");
 
+// const prisma = new PrismaClient();
+
 exports.materi_post = async (req, res) => {
+  let generatedToken = uuid();
   try {
     const isUser = await prisma.users.findUnique({
       where: {
@@ -16,7 +19,10 @@ exports.materi_post = async (req, res) => {
           id: uuid(),
           author_id: req.body.author_id,
           description: req.body.description,
-          thumbnail: req.body.thumbnail,
+          thumbnail:
+            req.body.thumbnail != null
+              ? req.body.thumbnail
+              : `https://firebasestorage.googleapis.com/v0/b/${config.storageBucket}/o/thumbnail%2Fvideo_place.jpeg?alt=media&token=${generatedToken}`,
           title: req.body.title,
           type: req.body.type,
           url: req.body.url,
@@ -53,7 +59,24 @@ exports.materi_post = async (req, res) => {
 
 exports.materi_get_all = async (req, res, next) => {
   try {
-    const materi = await prisma.materi.findMany({});
+    const materi = await prisma.materi.findMany({
+      select: {
+        id: true,
+        title: true,
+        users: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+        thumbnail: true,
+        url: true,
+        type: true,
+        description: true,
+        created_at: true,
+        updated_at: true,
+      },
+    });
     if (materi) {
       return res.status(200).json({
         status: 200,
@@ -78,24 +101,33 @@ exports.materi_get_all = async (req, res, next) => {
 
 exports.materi_update = async (req, res, next) => {
   try {
-    const materi = await prisma.materi.update({
+    const findMateri = await prisma.materi.findUnique({
+      where: {
+        id: req.params.materiId,
+      },
+    });
+    const updateMateri = await prisma.materi.update({
       where: {
         id: req.params.materiId,
       },
       data: {
         description: req.body.description,
-        thumbnail: req.body.thumbnail,
+        thumbnail:
+          req.body.thumbnail != null
+            ? req.body.thumbnail
+            : findMateri.thumbnail,
         title: req.body.title,
         type: req.body.type,
         url: req.body.url,
         updated_at: new Date(),
       },
     });
-    if (materi) {
+
+    if (updateMateri) {
       return res.status(200).json({
         status: 200,
         message: "ok",
-        data: materi,
+        data: findMateri,
       });
     } else {
       return res.status(403).json({
@@ -184,7 +216,7 @@ exports.materi_update_image = (req, res, next) => {
   try {
     uploadImageToStorage(req.params.materiId, file, "materi")
       .then(async (success) => {
-        const materi = await prisma.materi.update({
+        const findMateri = await prisma.materi.update({
           where: {
             id: req.params.materiId,
           },
@@ -192,7 +224,7 @@ exports.materi_update_image = (req, res, next) => {
             thumbnail: success,
           },
         });
-        if (materi) {
+        if (findMateri) {
           return res.status(200).json({
             status: 200,
             message: `Berhasil update foto materi`,
