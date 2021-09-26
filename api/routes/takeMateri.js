@@ -6,7 +6,7 @@ const { prisma } = require("../../utils/db");
 const check_auth = require("../middleware/check_auth");
 // const prisma = new PrismaClient();
 
-router.post("/",check_auth, async (req, res, next) => {
+router.post("/", check_auth, async (req, res, next) => {
   try {
     const findTakeMateri = await prisma.take_materi.findFirst({
       where: {
@@ -101,7 +101,7 @@ router.post("/",check_auth, async (req, res, next) => {
   }
 });
 
-router.delete("/:tkItemsId",check_auth, async (req, res, next) => {
+router.delete("/:tkItemsId", check_auth, async (req, res, next) => {
   try {
     const findTakeMateri = await prisma.take_materi_items.findUnique({
       where: {
@@ -140,7 +140,7 @@ router.delete("/:tkItemsId",check_auth, async (req, res, next) => {
   }
 });
 
-router.get("/",check_auth, async (req, res, next) => {
+router.get("/", check_auth, async (req, res, next) => {
   try {
     const materiItems = await prisma.take_materi_items.findMany({});
     if (materiItems) {
@@ -177,7 +177,26 @@ router.get("/user/:userId", async (req, res, next) => {
       },
       select: {
         id: true,
-        materi: true,
+        materi: {
+          select: {
+            id: true,
+            title: true,
+            users: {
+              select: {
+                id: true,
+                name: true,
+                image_url: true,
+                previlage: true,
+              },
+            },
+            thumbnail: true,
+            url: true,
+            type: true,
+            description: true,
+            created_at: true,
+            updated_at: true,
+          },
+        },
         created_at: true,
         updated_at: true,
       },
@@ -186,7 +205,7 @@ router.get("/user/:userId", async (req, res, next) => {
       return res.status(200).json({
         status: 200,
         message: "Ok",
-        length:materiItems.length,
+        length: materiItems.length,
         data: materiItems,
       });
     } else {

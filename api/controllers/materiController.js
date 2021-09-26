@@ -189,6 +189,24 @@ exports.materi_detail = async (req, res, next) => {
       where: {
         id: req.params.materiId,
       },
+      select: {
+        id: true,
+        title: true,
+        users: {
+          select: {
+            id: true,
+            name: true,
+            image_url: true,
+            previlage: true,
+          },
+        },
+        thumbnail: true,
+        url: true,
+        type: true,
+        description: true,
+        created_at: true,
+        updated_at: true,
+      },
     });
     if (materi) {
       return res.status(200).json({
