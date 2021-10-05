@@ -192,6 +192,8 @@ router.get("/user/:userId", async (req, res, next) => {
             thumbnail: true,
             url: true,
             type: true,
+            view: true,
+            like: true,
             description: true,
             created_at: true,
             updated_at: true,

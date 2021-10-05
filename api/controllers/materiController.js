@@ -1,3 +1,4 @@
+// const { PrismaClient } = require(".prisma/client");
 const { v4: uuid } = require("uuid");
 const config = require("../../utils/config");
 const { prisma } = require("../../utils/db");
@@ -26,6 +27,8 @@ exports.materi_post = async (req, res) => {
           title: req.body.title,
           type: req.body.type,
           url: req.body.url,
+          view: 0,
+          like: 0,
           created_at: new Date(),
           updated_at: new Date(),
         },
@@ -72,6 +75,8 @@ exports.materi_get_all = async (req, res, next) => {
         thumbnail: true,
         url: true,
         type: true,
+        view: true,
+        like: true,
         description: true,
         created_at: true,
         updated_at: true,
@@ -255,6 +260,90 @@ exports.materi_update_image = (req, res, next) => {
         console.error(error);
         return res.status(500).json({ status: 500, message: error });
       });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      status: 500,
+      message: error,
+    });
+  }
+};
+
+exports.materi_add_views = async (req, res, next) => {
+  try {
+    const findMateri = await prisma.materi.findUnique({
+      where: {
+        id: req.params.materiId,
+      },
+    });
+    if (findMateri) {
+      const updateMateri = await prisma.materi.update({
+        where: {
+          id: findMateri.id,
+        },
+        data: {
+          view: findMateri.view + 1,
+        },
+      });
+      if (updateMateri) {
+        return res.status(200).json({
+          status: 200,
+          message: "Berhasil update jumlah views",
+        });
+      } else {
+        return res.status(403).json({
+          status: 403,
+          message: "Materi tidak ditemukan",
+        });
+      }
+    } else {
+      return res.status(403).json({
+        status: 403,
+        message: "Materi tidak ditemukan",
+      });
+    }
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      status: 500,
+      message: error,
+    });
+  }
+};
+
+exports.materi_add_likes = async (req, res, next) => {
+  try {
+    const findMateri = await prisma.materi.findUnique({
+      where: {
+        id: req.params.materiId,
+      },
+    });
+    if (findMateri) {
+      const updateMateri = await prisma.materi.update({
+        where: {
+          id: findMateri.id,
+        },
+        data: {
+          like: findMateri.like + 1,
+        },
+      });
+      if (updateMateri) {
+        return res.status(200).json({
+          status: 200,
+          message: "Berhasil update jumlah likes",
+        });
+      } else {
+        return res.status(403).json({
+          status: 403,
+          message: "Materi tidak ditemukan",
+        });
+      }
+    } else {
+      return res.status(403).json({
+        status: 403,
+        message: "Materi tidak ditemukan",
+      });
+    }
   } catch (error) {
     console.log(error);
     return res.status(500).json({

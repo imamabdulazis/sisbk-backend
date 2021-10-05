@@ -8,24 +8,22 @@ datasource db {
 }
 
 model users {
-  id                          String            @id @db.Uuid
-  name                        String?           @db.VarChar
-  email                       String?           @db.VarChar
-  username                    String?           @db.VarChar
-  password                    String?           @db.VarChar
-  address                     String?
-  previlage                   String?           @db.VarChar
-  active                      Boolean?
-  image_url                   String?           @db.VarChar
-  created_at                  DateTime?         @db.Timestamp(6)
-  updated_at                  DateTime?         @db.Timestamp(6)
-  contact_teacher             contact_teacher[]
-  group_users                 group_users[]
-  materi                      materi[]
-  message                     message[]
-  quiz_quiz_host_idTousers    quiz[]            @relation("quiz_host_idTousers")
-  quiz_quiz_student_idTousers quiz[]            @relation("quiz_student_idTousers")
-  take_materi                 take_materi[]
+  id              String            @id @db.Uuid
+  name            String?           @db.VarChar
+  email           String?           @db.VarChar
+  username        String?           @db.VarChar
+  password        String?           @db.VarChar
+  address         String?
+  previlage       String?           @db.VarChar
+  active          Boolean?
+  image_url       String?           @db.VarChar
+  created_at      DateTime?         @db.Timestamp(6)
+  updated_at      DateTime?         @db.Timestamp(6)
+  contact_teacher contact_teacher[]
+  group_users     group_users[]
+  materi          materi[]
+  message         message[]
+  take_materi     take_materi[]
 }
 
 model group {
@@ -55,6 +53,8 @@ model materi {
   thumbnail         String?             @db.VarChar
   url               String?             @db.VarChar
   type              Int?
+  view              Int?
+  like              Int?
   created_at        DateTime?           @db.Timestamp(6)
   updated_at        DateTime?           @db.Timestamp(6)
   users             users?              @relation(fields: [author_id], references: [id])
@@ -72,43 +72,13 @@ model message {
   users      users?    @relation(fields: [user_id], references: [id])
 }
 
-model quiz {
-  id                           String          @id @db.Uuid
-  host_id                      String?         @db.Uuid
-  student_id                   String?         @db.Uuid
-  title                        String?         @db.VarChar
-  description                  String?
-  summary                      String?         @db.VarChar
-  final_score                  Int?
-  published                    Boolean?
-  created_at                   DateTime?       @db.Timestamp(6)
-  updated_at                   DateTime?       @db.Timestamp(6)
-  users_quiz_host_idTousers    users?          @relation("quiz_host_idTousers", fields: [host_id], references: [id])
-  users_quiz_student_idTousers users?          @relation("quiz_student_idTousers", fields: [student_id], references: [id])
-  quiz_answer                  quiz_answer[]
-  quiz_question                quiz_question[]
-}
-
-model quiz_answer {
-  id            String         @id @db.Uuid
-  quiz_id       String?        @db.Uuid
-  question_id   String?        @db.Uuid
-  answer        Boolean?
-  created_at    DateTime?      @db.Timestamp(6)
-  updated_at    DateTime?      @db.Timestamp(6)
-  quiz_question quiz_question? @relation(fields: [question_id], references: [id])
-  quiz          quiz?          @relation(fields: [quiz_id], references: [id])
-}
-
 model quiz_question {
-  id          String        @id @db.Uuid
-  quiz_id     String?       @db.Uuid
-  question    String?
-  answer      Boolean?
-  created_at  DateTime?     @db.Timestamp(6)
-  updated_at  DateTime?     @db.Timestamp(6)
-  quiz        quiz?         @relation(fields: [quiz_id], references: [id])
-  quiz_answer quiz_answer[]
+  id         String    @id @db.Uuid
+  question   String?
+  answer     Boolean?
+  point      Int?
+  created_at DateTime? @db.Timestamp(6)
+  updated_at DateTime? @db.Timestamp(6)
 }
 
 model take_materi {

@@ -33,4 +33,8 @@ router.put(
 
 router.get("/:materiId", check_auth, MateriController.materi_detail);
 
+router.post("/views/:materiId", MateriController.materi_add_views);
+
+router.post("/likes/:materiId", MateriController.materi_add_likes);
+
 module.exports = router;
