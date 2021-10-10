@@ -3,10 +3,10 @@ const router = express.Router();
 const { v4: uuid } = require("uuid");
 const check_auth = require("../middleware/check_auth");
 const config = require("../../utils/config");
-const { prisma } = require("../../utils/db");
+// const { prisma } = require("../../utils/db");
 
-// const { PrismaClient } = require("@prisma/client");
-// const prisma = new PrismaClient();
+const { PrismaClient } = require("@prisma/client");
+const prisma = new PrismaClient();
 
 router.get("/", async (req, res, next) => {
   try {
@@ -49,8 +49,8 @@ router.post("/", async (req, res, next) => {
         data: {
           id: uuid(),
           question: req.body.question,
-          answer: req.body.answer,
-          point: req.body.point,
+          correct_answer: req.body.correct_answer,
+          incorrect_answers: req.body.incorrect_answers,
           created_at: new Date(),
           updated_at: new Date(),
         },
@@ -90,8 +90,8 @@ router.put("/:quizId", async (req, res, next) => {
         },
         data: {
           question: req.body.question,
-          answer: req.body.answer,
-          point: req.body.point,
+          correct_answer: req.body.correct_answer,
+          incorrect_answers: req.body.incorrect_answers,
         },
       });
       if (updateQuiz) {
