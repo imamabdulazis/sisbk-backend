@@ -73,12 +73,12 @@ model message {
 }
 
 model quiz_question {
-  id         String    @id @db.Uuid
-  question   String?
-  answer     Boolean?
-  point      Int?
-  created_at DateTime? @db.Timestamp(6)
-  updated_at DateTime? @db.Timestamp(6)
+  id                String    @id @db.Uuid
+  question          String?
+  correct_answer    String?   @db.VarChar
+  incorrect_answers String?   @db.VarChar
+  created_at        DateTime? @db.Timestamp(6)
+  updated_at        DateTime? @db.Timestamp(6)
 }
 
 model take_materi {
