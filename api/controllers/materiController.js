@@ -27,6 +27,7 @@ exports.materi_post = async (req, res) => {
           title: req.body.title,
           type: req.body.type,
           url: req.body.url,
+          file: req.body.file,
           view: 0,
           like: 0,
           created_at: new Date(),
@@ -122,6 +123,7 @@ exports.materi_update = async (req, res, next) => {
           req.body.thumbnail != null
             ? req.body.thumbnail
             : findMateri.thumbnail,
+        file: req.body.file != null ? req.body.file : findMateri.file,
         title: req.body.title,
         type: req.body.type,
         url: req.body.url,
