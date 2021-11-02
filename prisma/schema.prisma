@@ -57,6 +57,7 @@ model materi {
   like              Int?
   created_at        DateTime?           @db.Timestamp(6)
   updated_at        DateTime?           @db.Timestamp(6)
+  file              String?
   users             users?              @relation(fields: [author_id], references: [id])
   take_materi_items take_materi_items[]
 }
