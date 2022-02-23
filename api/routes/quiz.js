@@ -3,14 +3,72 @@ const router = express.Router();
 const { v4: uuid } = require("uuid");
 const check_auth = require("../middleware/check_auth");
 const config = require("../../utils/config");
-// const { prisma } = require("../../utils/db");
+const { prisma } = require("../../utils/db");
 
-const { PrismaClient } = require("@prisma/client");
-const prisma = new PrismaClient();
+// const { PrismaClient } = require("@prisma/client");
+// const prisma = new PrismaClient();
 
 router.get("/", async (req, res, next) => {
   try {
-    const allQuiz = await prisma.quiz_question.findMany({});
+    const allQuiz = await prisma.quiz.findMany({
+      select: {
+        id: true,
+        question: true,
+        quiz_type: {
+          select: {
+            id: true,
+            title: true,
+          },
+        },
+        correct_answer: true,
+        incorrect_answers: true,
+        updated_at: true,
+        created_at: true,
+      },
+    });
+    if (allQuiz) {
+      return res.status(200).json({
+        status: 200,
+        message: "Ok",
+        data: allQuiz,
+      });
+    } else {
+      return res.status(403).json({
+        status: 403,
+        message: "Quiz gagal di dapatkan",
+      });
+    }
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      status: 500,
+      message: error,
+    });
+  }
+});
+
+///GET BY QUIZ TYPE
+router.get("/:quiz_type_id", async (req, res, next) => {
+  try {
+    const allQuiz = await prisma.quiz.findMany({
+      where: {
+        quiz_type_id: req.params.quiz_type_id,
+      },
+      select: {
+        id: true,
+        question: true,
+        quiz_type: {
+          select: {
+            id: true,
+            title: true,
+          },
+        },
+        correct_answer: true,
+        incorrect_answers: true,
+        updated_at: true,
+        created_at: true,
+      },
+    });
     if (allQuiz) {
       return res.status(200).json({
         status: 200,
@@ -34,7 +92,7 @@ router.get("/", async (req, res, next) => {
 
 router.post("/", async (req, res, next) => {
   try {
-    const existQuestion = await prisma.quiz_question.findFirst({
+    const existQuestion = await prisma.quiz.findFirst({
       where: {
         question: req.body.question,
       },
@@ -45,10 +103,11 @@ router.post("/", async (req, res, next) => {
         message: "Pertanyaan quiz tidak boleh sama",
       });
     } else {
-      const createQuiz = await prisma.quiz_question.create({
+      const createQuiz = await prisma.quiz.create({
         data: {
           id: uuid(),
           question: req.body.question,
+          quiz_type_id: req.body.quiz_type_id,
           correct_answer: req.body.correct_answer,
           incorrect_answers: req.body.incorrect_answers,
           created_at: new Date(),
@@ -63,7 +122,7 @@ router.post("/", async (req, res, next) => {
       } else {
         return res.status(403).json({
           status: 403,
-          message: "Quiz gagal di dapatkan",
+          message: "Quiz gagal di buat",
         });
       }
     }
@@ -78,13 +137,13 @@ router.post("/", async (req, res, next) => {
 
 router.put("/:quizId", async (req, res, next) => {
   try {
-    const findQuiz = await prisma.quiz_question.findUnique({
+    const findQuiz = await prisma.quiz.findUnique({
       where: {
         id: req.params.quizId,
       },
     });
     if (findQuiz) {
-      const updateQuiz = await prisma.quiz_question.update({
+      const updateQuiz = await prisma.quiz.update({
         where: {
           id: findQuiz.id,
         },
@@ -122,13 +181,13 @@ router.put("/:quizId", async (req, res, next) => {
 
 router.delete("/:quizId", async (req, res, next) => {
   try {
-    const findQuiz = await prisma.quiz_question.findUnique({
+    const findQuiz = await prisma.quiz.findUnique({
       where: {
         id: req.params.quizId,
       },
     });
     if (findQuiz) {
-      const deleteQuiz = await prisma.quiz_question.delete({
+      const deleteQuiz = await prisma.quiz.delete({
         where: {
           id: req.params.quizId,
         },

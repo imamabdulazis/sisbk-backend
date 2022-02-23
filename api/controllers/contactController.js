@@ -40,6 +40,8 @@ exports.createContact = async (req, res, next) => {
               : `https://firebasestorage.googleapis.com/v0/b/${config.storageBucket}/o/users%2Fusers.png?alt=media&token=${generatedToken}`,
           job_desc: req.body.job_desc,
           phone: req.body.phone,
+          created_at: new Date(),
+          updated_at: new Date(),
         },
       });
       if (contact) {
@@ -116,6 +118,7 @@ exports.contactUpdate = async (req, res, next) => {
             req.body.image_url != null
               ? req.body.image_url
               : findContact.image_url,
+          updated_at: new Date(),
         },
       });
       if (updateContact) {

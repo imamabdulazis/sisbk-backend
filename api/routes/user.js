@@ -12,10 +12,11 @@ const Multer = require("multer");
 
 const UserController = require("../controllers/userController");
 
-// const { prisma } = require("../../utils/db");
-const { PrismaClient } = require("@prisma/client");
 const { uploadImageToStorage } = require("../../utils/uploader");
-const prisma = new PrismaClient();
+// const { prisma } = require("../../utils/db");
+
+// const { PrismaClient } = require("@prisma/client");
+// const prisma = new PrismaClient();
 
 const multer = Multer({
   storage: Multer.memoryStorage(),

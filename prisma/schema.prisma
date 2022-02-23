@@ -23,6 +23,7 @@ model users {
   group_users     group_users[]
   materi          materi[]
   message         message[]
+  quiz_type       quiz_type[]
   take_materi     take_materi[]
 }
 
@@ -73,15 +74,6 @@ model message {
   users      users?    @relation(fields: [user_id], references: [id])
 }
 
-model quiz_question {
-  id                String    @id @db.Uuid
-  question          String?
-  correct_answer    String?   @db.VarChar
-  incorrect_answers String?   @db.VarChar
-  created_at        DateTime? @db.Timestamp(6)
-  updated_at        DateTime? @db.Timestamp(6)
-}
-
 model take_materi {
   id                String              @id @db.Uuid
   student_id        String?             @db.Uuid
@@ -102,14 +94,37 @@ model take_materi_items {
 }
 
 model contact_teacher {
-  id        String  @id @db.Uuid
-  author_id String? @db.Uuid
-  name      String? @db.VarChar
-  email     String? @db.VarChar
-  phone     String? @db.VarChar
-  address   String?
-  image_url String?
-  job_desc  String?
-  edu_title String? @db.VarChar
-  users     users?  @relation(fields: [author_id], references: [id])
+  id         String    @id @db.Uuid
+  author_id  String?   @db.Uuid
+  name       String?   @db.VarChar
+  email      String?   @db.VarChar
+  phone      String?   @db.VarChar
+  address    String?
+  image_url  String?
+  job_desc   String?
+  edu_title  String?   @db.VarChar
+  created_at DateTime? @db.Timestamp(6)
+  updated_at DateTime? @db.Timestamp(6)
+  users      users?    @relation(fields: [author_id], references: [id])
+}
+
+model quiz {
+  id                String     @id @db.Uuid
+  question          String?
+  correct_answer    String?    @db.VarChar
+  incorrect_answers String?    @db.VarChar
+  created_at        DateTime?  @db.Timestamp(6)
+  updated_at        DateTime?  @db.Timestamp(6)
+  quiz_type_id      String?    @db.Uuid
+  quiz_type         quiz_type? @relation(fields: [quiz_type_id], references: [id])
+}
+
+model quiz_type {
+  id         String    @id @db.Uuid
+  user_id    String    @db.Uuid
+  title      String?   @db.VarChar
+  created_at DateTime? @db.Timestamp(6)
+  updated_at DateTime? @db.Timestamp(6)
+  users      users     @relation(fields: [user_id], references: [id])
+  quiz       quiz[]
 }
